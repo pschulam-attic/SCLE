@@ -6,9 +6,17 @@ Created on Jan 20, 2011
 
 from nltk.tag import DefaultTagger, UnigramTagger, BigramTagger, TrigramTagger, brill
 from nltk.corpus import brown
-from tag_util import backoff_tagger
 from cPickle import dump, load
 import os
+
+def backoff_tagger(train_sents, tagger_classes, backoff=None):
+    '''
+    Creates a backoff tagger given the training sentences and
+    the sequence of taggers specified in tagger_classes.
+    '''
+    for cls in tagger_classes:
+        backoff = cls(train_sents, backoff=backoff)
+    return backoff
 
 class Tagger(object):
     '''
