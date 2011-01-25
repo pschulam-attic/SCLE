@@ -4,69 +4,98 @@ Sun Jan 23 11:26:17 EST 2011
 @author: pschulam
 '''
 
-import nltk
+import nltk, os, random
 from nltk.corpus import conll2000
+from nltk.tag import ClassifierBasedTagger
+from cPickle import dump, load
+
+_pickle_file = 'pickles/chunker.pkl'
+_test_sents_pickle_file = 'pickles/chunker_test_sents.pkl'
+
+def refresh():
+    os.remove(os.getcwd() + '/' + _pickle_file)
+    os.remove(os.getcwd() + '/' + _test_sents_pickle_file)
 
 def npchunk_features(sentence, i, history):
     '''
     Defines a set of features to be extracted for a particular
     chunk tagged word in a sentence. We have the entire sentence,
     the current word index, and the history of previous tags
-    available to us. For now we will only use the POS of the current
-    word as a feature, but we can add more later.
+    available to us. 
     '''
     word, pos = sentence[i]
-    return {"pos": pos}
+    if i == 0:
+        prevword, prevpos = "<START>", "<START>"
+    else:
+        prevword, prevpos = sentence[i-1]
+    if i == len(sentence) - 1:
+        nextword, nextpos = "<END>", "<END>"
+    else:
+        nextword, nextpos = sentence[i+1]
+    return {"pos": pos,
+            "word": word,
+            "prevpos": prevpos,
+            "nextpos": nextpos,
+            "prevpos+pos": "%s+%s" % (prevpos, pos),
+            "pos+nextpos": "%s+%s" % (pos, nextpos),
+            "tags-since-dt": tags_since_dt(sentence, i)}
 
-class ChunkTagger(nltk.TaggerI):
+def tags_since_dt(sentence, i):
     '''
-    Assigns chunk tags to each word given its POS tag.
-    Uses a maximum entropy classifier that is trained on a set of
-    sentences that have been both POS and chunk tagged.
+    Gathers the parts of speech between the last
+    determiner and the current index.
     '''
+    tags = set()
+    for word, pos in sentence[:i]:
+        if pos == 'DT':
+            tags = set()
+        else:
+            tags.add(pos)
+    return '+'.join(sorted(tags))
 
-    def __init__(self, train_sents):
-        '''
-        Constructor. Must pass a set of sentences that have been
-        both POS and chunk tagged for training.
-        '''
-        train_set = []
-        for ctagged_sent in train_sents:
-            pos_tagged_sent = nltk.tag.untag(ctagged_sent)
-            history = []
-            for i, (word, ctag) in enumerate(ctagged_sent):
-                featureset = npchunk_features(pos_tagged_sent, i, history)
-                train_set.append( (featureset, ctag) )
-                history.append(ctag)
-            self.classifier = nltk.MaxentClassifier.train(
-                    train_set, algorithm='megam', trace=0)
-
-    def tag(self, sentence):
-        '''
-        Given a POS tagged sentence, produces the most probable
-        chunk tag using a maximum entropy classifier.
-        '''
-        history = []
-        for i, word in enumerate(sentence):
-            featureset = npchunk_features(sentence, i, history)
-            tag = self.classifier.classify(featureset)
-            history.append(tag)
-        return zip(sentence, history)
-
-class Chunker(nltk.ChunkParserI):
+class Chunker(nltk.chunk.ChunkParserI):
     '''
     Chunker for SCLE. Only chunks NP for now.
     '''
     def __init__(self):
-        train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
-        ctagged_sents = [[((w,t),c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in train_sents]
-        self.tagger = ChunkTagger(ctagged_sents)
 
-    def parse(self, sentence):
+        # Check if a ChunkTagger has already been pickled
+        if (os.path.exists(os.getcwd() + '/' + _pickle_file)):
+            input = open(_pickle_file, 'rb')
+            self._tagger = load(input)
+            input.close()
+            input = open(_test_sents_pickle_file, 'rb')
+            self._test_sents = load(input)
+            input.close()
+
+        else:
+            train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+            ctagged_sents = [[((w,t),c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in train_sents]
+            test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
+            self._test_sents = [[((w,t), c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in test_sents]
+            self._tagger = ClassifierBasedTagger(train=ctagged_sents, feature_detector=npchunk_features)
+
+            # Pickle the chunker that has just been created
+            if not os.path.exists(os.getcwd() + '/pickles/'):
+                os.mkdir(os.getcwd() + '/pickles/')
+            output = open(_pickle_file, 'wb')
+            dump(self._tagger, output, -1)
+            output.close()
+            output = open(_test_sents_pickle_file, 'wb')
+            dump(self._test_sents, output, 01)
+            output.close()
+
+    def chunk(self, sentence):
         '''
         Accepts a sentence with POS tags and produces a NP chunk parse.
         '''
-        ctagged_sents = self.tagger.tag(sentence)
+        ctagged_sents = self._tagger.tag(sentence)
         conlltags = [(w,t,c) for ((w,t),c) in ctagged_sents]
         return nltk.chunk.conlltags2tree(conlltags)
+    
+    def evaluate(self):
+        '''
+        Evaluate the chunker.
+        '''
+        print self._tagger.evaluate(self._test_sents)
 
