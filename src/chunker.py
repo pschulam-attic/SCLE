@@ -4,13 +4,9 @@ Sun Jan 23 11:26:17 EST 2011
 @author: pschulam
 '''
 
-import nltk, os, random
+import nltk
 from nltk.corpus import conll2000
 from nltk.tag import ClassifierBasedTagger
-
-def refresh():
-    os.remove(os.getcwd() + '/' + _pickle_file)
-    os.remove(os.getcwd() + '/' + _test_sents_pickle_file)
 
 def npchunk_features(sentence, i, history):
     '''
