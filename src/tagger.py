@@ -7,7 +7,17 @@ Created on Jan 20, 2011
 from nltk.tag import DefaultTagger, UnigramTagger, BigramTagger, TrigramTagger, brill
 from nltk.corpus import brown
 from cPickle import dump, load
-import os
+import os, random
+
+_pickle_file = 'pickles/tagger.pkl'
+_test_sents_pickle_file = 'pickles/tagger_test_sents.pkl'
+
+def refresh():
+    '''
+    Remove the pickle files for the tagger and test sentences.
+    '''
+    os.remove(os.getcwd() + '/' + _pickle_file)
+    os.remove(os.getcwd() + '/' + _test_sents_pickle_file)
 
 def backoff_tagger(train_sents, tagger_classes, backoff=None):
     '''
@@ -31,21 +41,26 @@ class Tagger(object):
         Constructor
         '''
 
-        self._pickle_file = 'tagger.pkl'
-
         # Before building a new tagger check if one has already been pickled
-        if (os.path.exists(os.getcwd() + '/' + self._pickle_file)):
+        if (os.path.exists(os.getcwd() + '/' + _pickle_file)):
             input = open(self._pickle_file, 'rb')
             self._tagger = load(input)
+            input.close()
+            input = open(_test_sents_pickle_file, 'rb')
+            self._test_sents = load(input)
             input.close()
             
         # Primitives necessary for training the Brill tagger.
         # Taken from cookbook
         else:
-            brown_tagged_sents = brown.tagged_sents()
+            tagged_sents = list(brown.tagged_sents())
+            random.shuffle(tagged_sents)
+            split_index = int(round(0.8 * len(tagged_sents)))
+            train_sents = tagged_sents[:split_index]
+            self._test_sents = tagged_sents[split_index:]
             default_tagger = DefaultTagger('NN')
             tagger_classes = [UnigramTagger, BigramTagger, TrigramTagger]
-            initial_tagger = backoff_tagger(brown_tagged_sents, tagger_classes, backoff=default_tagger)
+            initial_tagger = backoff_tagger(train_sents, tagger_classes, backoff=default_tagger)
             sym_bounds = [(1,1), (2,2), (1,2), (1,3)]
             asym_bounds = [(-1, -1), (1,1)]
             templates = [
@@ -56,24 +71,23 @@ class Tagger(object):
 
             # Train the tagger
             trainer = brill.FastBrillTaggerTrainer(initial_tagger, templates, deterministic=True)
-            self._tagger = trainer.train(brown_tagged_sents)
+            self._tagger = trainer.train(train_sents)
 
             #Pickle the trained tagger
-            output = open(self._pickle_file, 'wb')
+            if not os.path.exists(os.getcwd() + '/pickles/'):
+                os.mkdir(os.getcwd() + '/pickles/')
+            output = open(_pickle_file, 'wb')
             dump(self._tagger, output, -1)
             output.close()
+            output = open(_test_sents_pickle_file, 'wb')
+            dump(self._test_sents, output, -1)
+            output.close()
 
-    def _refresh(self):
-        '''
-        Removes the pickle file containing the tagger.
-        '''
-        os.remove(os.getcwd() + '/' + self._pickle_file)
-
-    def _evaluate(self):
+    def evaluate(self):
         '''
         Evaluate the tagger
         '''
-        pass
+        print self._tagger.evaluate(self._test_sents)
         
     def tag(self, tokens):
         '''
