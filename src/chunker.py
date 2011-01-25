@@ -60,7 +60,7 @@ class Chunker(nltk.chunk.ChunkParserI):
     def chunk(self, sentences):
         '''
         '''
-        chunked_sents - []
+        chunked_sents = []
         for sent in sentences:
             c_sent = self._tagger.tag(sent)
             conlltags =[(w,t,c) for ((w,t),c) in c_sent]

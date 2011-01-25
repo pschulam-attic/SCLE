@@ -12,29 +12,21 @@ class Tokenizer(object):
     Mainly tokenizes.
     '''
 
-    def __init__(self, filename):
+    def __init__(self):
         '''
-        Constructor
-        
-        Takes the document that will be processed as input
+        Constructor. Doesn't do anything.
+        '''
+        pass
+
+    def tokenize(self, filename):
+        '''
+        Split the text in the given file into a list of lists of words.
+        Each nested list should be one sentence in the document.
         '''
         fd = open(filename, 'r')
         doc = fd.read()
         fd.close()
-        self._sentences = sent_tokenize(doc)
-        self._sentences = [word_tokenize(sent) for sent in self._sentences]
+        sents = sent_tokenize(doc)
+        sents = [word_tokenize(sent) for sent in sents]
+        return sents
 
-    def get_sentences(self):
-        '''
-        Returns the sentences stored in this instance
-        '''
-        return self._sentences
-        
-    def print_sentences(self):
-        '''
-        Prints out the the document.
-        '''
-        for sent in self._sentences:
-            for word in sent:
-                print word,
-            print

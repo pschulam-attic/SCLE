@@ -43,7 +43,7 @@ class Tagger(object):
 
         # Before building a new tagger check if one has already been pickled
         if (os.path.exists(os.getcwd() + '/' + _pickle_file)):
-            input = open(self._pickle_file, 'rb')
+            input = open(_pickle_file, 'rb')
             self._tagger = load(input)
             input.close()
             input = open(_test_sents_pickle_file, 'rb')
