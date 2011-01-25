@@ -89,15 +89,15 @@ class Tagger(object):
         '''
         print self._tagger.evaluate(self._test_sents)
         
-    def tag(self, tokens):
+    def tag(self, sentences):
         '''
         Tags the tokens provided. Returns a list of tuples containing each word
         and its tag. The tokens must be provided as a list of sentences, where each sentence is a
         list of word tokens.
         '''
-        tags = []
+        tagged_sents = []
         
-        for sent in tokens:
-            tags.append(self._tagger.tag(sent))
+        for sent in sentences:
+            tagged_sents.append(self._tagger.tag(sent))
             
-        return tags
+        return tagged_sents

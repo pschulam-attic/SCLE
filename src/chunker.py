@@ -61,14 +61,16 @@ class Chunker(nltk.chunk.ChunkParserI):
         self._test_sents = [[((w,t), c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in test_sents]
         self._tagger = ClassifierBasedTagger(train=ctagged_sents, feature_detector=npchunk_features)
 
-    def chunk(self, sentence):
+    def chunk(self, sentences):
         '''
-        Accepts a sentence with POS tags and produces a NP chunk parse.
         '''
-        ctagged_sents = self._tagger.tag(sentence)
-        conlltags = [(w,t,c) for ((w,t),c) in ctagged_sents]
-        return nltk.chunk.conlltags2tree(conlltags)
-    
+        chunked_sents - []
+        for sent in sentences:
+            c_sent = self._tagger.tag(sent)
+            conlltags =[(w,t,c) for ((w,t),c) in c_sent]
+            chunked_sents.append(nltk.chunk.conlltags2tree(conlltags))
+        return chunked_sents
+   
     def evaluate(self):
         '''
         Evaluate the chunker.
