@@ -6,23 +6,27 @@ Created on Jan 20, 2011
 
 from nltk import sent_tokenize, word_tokenize
 
-class Preprocessor(object):
+class Tokenizer(object):
     '''
     Does all of the steps necessary before tagging and chunking.
+    Mainly tokenizes.
     '''
 
-    def __init__(self, document):
+    def __init__(self, filename):
         '''
         Constructor
         
         Takes the document that will be processed as input
         '''
-        self._sentences = sent_tokenize(document)
+        fd = open(filename, 'r')
+        doc = fd.read()
+        fd.close()
+        self._sentences = sent_tokenize(doc)
         self._sentences = [word_tokenize(sent) for sent in self._sentences]
 
     def get_sentences(self):
         '''
-        Prints the sentences stored in this instance
+        Returns the sentences stored in this instance
         '''
         return self._sentences
         
