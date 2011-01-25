@@ -7,10 +7,6 @@ Sun Jan 23 11:26:17 EST 2011
 import nltk, os, random
 from nltk.corpus import conll2000
 from nltk.tag import ClassifierBasedTagger
-from cPickle import dump, load
-
-_pickle_file = 'pickles/chunker.pkl'
-_test_sents_pickle_file = 'pickles/chunker_test_sents.pkl'
 
 def refresh():
     os.remove(os.getcwd() + '/' + _pickle_file)
@@ -59,31 +55,11 @@ class Chunker(nltk.chunk.ChunkParserI):
     '''
     def __init__(self):
 
-        # Check if a ChunkTagger has already been pickled
-        if (os.path.exists(os.getcwd() + '/' + _pickle_file)):
-            input = open(_pickle_file, 'rb')
-            self._tagger = load(input)
-            input.close()
-            input = open(_test_sents_pickle_file, 'rb')
-            self._test_sents = load(input)
-            input.close()
-
-        else:
-            train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
-            ctagged_sents = [[((w,t),c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in train_sents]
-            test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
-            self._test_sents = [[((w,t), c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in test_sents]
-            self._tagger = ClassifierBasedTagger(train=ctagged_sents, feature_detector=npchunk_features)
-
-            # Pickle the chunker that has just been created
-            if not os.path.exists(os.getcwd() + '/pickles/'):
-                os.mkdir(os.getcwd() + '/pickles/')
-            output = open(_pickle_file, 'wb')
-            dump(self._tagger, output, -1)
-            output.close()
-            output = open(_test_sents_pickle_file, 'wb')
-            dump(self._test_sents, output, 01)
-            output.close()
+        train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+        ctagged_sents = [[((w,t),c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in train_sents]
+        test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
+        self._test_sents = [[((w,t), c) for (w,t,c) in nltk.chunk.tree2conlltags(sent)] for sent in test_sents]
+        self._tagger = ClassifierBasedTagger(train=ctagged_sents, feature_detector=npchunk_features)
 
     def chunk(self, sentence):
         '''
