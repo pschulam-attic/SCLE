@@ -5,7 +5,7 @@ Created on Jan 20, 2011
 '''
 
 from nltk.tag import DefaultTagger, UnigramTagger, BigramTagger, TrigramTagger, brill
-from nltk.corpus import brown
+from nltk.corpus import brown, treebank
 from cPickle import dump, load
 import os, random
 
@@ -18,6 +18,21 @@ def refresh():
     '''
     os.remove(os.getcwd() + '/' + _pickle_file)
     os.remove(os.getcwd() + '/' + _test_sents_pickle_file)
+
+def nltk2collins(sentences):
+    res = []
+    for sent in sentences:
+        str_sent = "%s " % len(sent)
+        for word in sent:
+            str_sent += "%s %s " % word
+        res.append(str_sent)
+    return res
+
+def write_tagged_file(filename, sentences):
+    fd = open(filename, 'w')
+    for sent in sentences:
+        fd.write("%s\n" % sent)
+    fd.close()
 
 def backoff_tagger(train_sents, tagger_classes, backoff=None):
     '''
@@ -36,7 +51,7 @@ class Tagger(object):
     VPs containing adjective predicates.
     '''
 
-    def __init__(self):
+    def __init__(self, train_set='treebank'):
         '''
         Constructor
         '''
@@ -53,7 +68,10 @@ class Tagger(object):
         # Primitives necessary for training the Brill tagger.
         # Taken from cookbook
         else:
-            tagged_sents = list(brown.tagged_sents())
+            if train_set == 'treebank':
+                tagged_sents = list(treebank.tagged_sents())
+            else:
+                tagged_sents = list(brown.tagged_sents())
             random.shuffle(tagged_sents)
             split_index = int(round(0.8 * len(tagged_sents)))
             train_sents = tagged_sents[:split_index]
