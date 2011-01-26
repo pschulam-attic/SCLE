@@ -101,7 +101,6 @@ int main(int argc, char *argv[])
      time(&g_time);
 
      pthresh = -5000000;
-
      parse_sentence(&sentences[s]);
      
 /*     print_chart();*/

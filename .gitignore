@@ -1,3 +1,6 @@
 *.pyc
 *.pkl
 *.o
+*.swp
+*.tagged
+*.model[123]

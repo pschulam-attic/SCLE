@@ -25,3 +25,6 @@ sfs : main.o lexicon.o grammar.o mymalloc.o mymalloc_char.o key.o hash.o genprob
 cleanup:
 	rm *.o
 
+spotless: cleanup
+	rm parser
+
