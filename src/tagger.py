@@ -20,6 +20,9 @@ def refresh():
     os.remove(os.getcwd() + '/' + _test_sents_pickle_file)
 
 def nltk2collins(sentences):
+    '''
+    Converts an nltk tagged sentence to collins format.
+    '''
     res = []
     for sent in sentences:
         str_sent = "%s " % len(sent)
@@ -29,6 +32,10 @@ def nltk2collins(sentences):
     return res
 
 def write_tagged_file(filename, sentences):
+    '''
+    Writes a collins formatted file containing the sentences
+    in 'sentences'.
+    '''
     fd = open(filename, 'w')
     for sent in sentences:
         fd.write("%s\n" % sent)
