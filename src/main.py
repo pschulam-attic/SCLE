@@ -1,9 +1,10 @@
 #!/usr/bin/python
 from sys import argv
-from collins_prep import prep
+from stanford_tagger import tag
 from parser import parse
 from parse_cleaner import clean
 from parsetree import ParseTree
+from adjfinder import find_adjectives
 
 def main():
     '''
@@ -12,7 +13,7 @@ def main():
     '''
     filename = argv[1]
     print "Tagging file..."
-    tagged_file = prep(filename)
+    tagged_file = tag(filename)
     print "Parsing file..."
     parsed_file = parse(tagged_file)
     print "Cleaning parsed file..."
@@ -24,6 +25,9 @@ def main():
     for line in fd:
         tree = ParseTree(line)
         parse_trees.append(tree)
+
+    for tree in parse_trees:
+        find_adjectives(tree)
 
 if __name__ == "__main__":
     main()

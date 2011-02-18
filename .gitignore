@@ -3,4 +3,6 @@
 *.o
 *.swp
 *.tagged
+*.clean
 *.model[123]
+.*

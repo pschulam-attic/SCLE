@@ -1,27 +1,31 @@
 import re
-from sys import argv
+from parsenode import ParseNode
 
 class ParseTree(object):
+    '''
+    The tree representation of a parsed sentence. 
+    '''
     def __init__(self, str):
         self.root = self.build_node(str)
 
     def __iter__(self):
-        self.bfs_queue = []
-        self.bfs_queue.append(self.root)
+        self.dfs_stack = []
+        self.dfs_stack.append(self.root)
         return self
 
     def next(self):
-        if len(self.bfs_queue) == 0:
+        if len(self.dfs_stack) == 0:
             raise StopIteration
-        n = self.bfs_queue.pop(0)
+        n = self.dfs_stack.pop()
         for c in n:
-            self.bfs_queue.append(c)
+            self.dfs_stack.append(c)
         return n
 
     @staticmethod
     def build_node(str):
-        m = re.match(r'^\((\w+)~(\w+)~\d+~\d+', str)
-        parent = node(m.groups()[0], m.groups()[1])
+        #print "Examining: %s" % str
+        m = re.match(r'^\((\w+)~([\w\.]+)~\d+~\d+', str)
+        parent = ParseNode(m.groups()[0], m.groups()[1])
         str = str[m.end():]
 
         i = 0
@@ -31,6 +35,7 @@ class ParseTree(object):
                 depth += 1
                 if depth == 1:
                     child = ParseTree.build_node(str[i:])
+                    child.parent = parent
                     parent.children.append(child)
             elif c == ')':
                 if depth > 0:
@@ -39,7 +44,7 @@ class ParseTree(object):
                     if len(parent.children) == 0:
                         terminals = ParseTree.get_terminals(str[:i])
                         for t,pos in terminals:
-                            child = node('TERM', t, pos)
+                            child = ParseNode('TERM', t, parent, pos)
                             parent.children.append(child)
                     return parent
             i += 1
@@ -55,28 +60,3 @@ class ParseTree(object):
             pair = t.split('/')
             result.append(pair)
         return result
-
-class node(object):
-    def __init__(self, type, headword, pos=None):
-        self.type = type
-        self.headword = headword
-        if pos:
-            self.pos = pos
-        self.children = []
-
-    def __iter__(self):
-        self.cur_child = 0
-        return self
-
-    def next(self):
-        if self.cur_child >= len(self.children):
-            raise StopIteration
-        c = self.children(self.cur_child)
-        self.cur_child += 1
-        return c
-
-def main():
-    pass
-
-if __name__ == "__main__":
-    main()
