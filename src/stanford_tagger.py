@@ -14,7 +14,7 @@ tagger = "edu.stanford.nlp.tagger.maxent.MaxentTagger"
 model = "-model %smodels/bidirectional-distsim-wsj-0-18.tagger" % path
 
 def tag(filename):
-    output = filename[:-3] + 'tagged'
+    output = split(filename, '.')[0] + '.tagged'
     system("java %s %s %s %s -textFile %s > %s" % (memory, classpath, tagger, model, filename, output))
     stanford2collins(output)
     return output

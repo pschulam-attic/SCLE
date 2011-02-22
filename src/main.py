@@ -2,7 +2,7 @@
 from sys import argv
 from stanford_tagger import tag
 from parser import parse
-from parse_cleaner import clean
+from util import clean_parse
 from parsetree import ParseTree
 from adjfinder import find_adjectives
 
@@ -17,7 +17,7 @@ def main():
     print "Parsing file..."
     parsed_file = parse(tagged_file)
     print "Cleaning parsed file..."
-    clean_file = clean(parsed_file)
+    clean_file = clean_parse(parsed_file)
 
     fd = open(clean_file, 'r')
     parse_trees = []
@@ -26,8 +26,7 @@ def main():
         tree = ParseTree(line)
         parse_trees.append(tree)
 
-    for tree in parse_trees:
-        find_adjectives(tree)
+    find_adjectives(parse_trees)
 
 if __name__ == "__main__":
     main()
