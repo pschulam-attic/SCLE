@@ -546,7 +546,7 @@ class PatternOutput():
         self.num_of_seeds = len(seeds_dict)
         self.seeds_dict = seeds_dict
         self.max_seed = max(self.seeds_dict.values())
-        self.avg_seed = utils.divide(grad_utils.sum(self.seeds_dict.values()), 
+        self.avg_seed = utils.divide(utils.sum(self.seeds_dict.values()), 
                                                     self.num_of_seeds)
                 
     def _reverse_str_list(self, str = ""):

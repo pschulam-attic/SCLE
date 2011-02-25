@@ -122,6 +122,7 @@ def search(keywords, results=10):
         if len(googles) >= results:
             break
         nextPage = getNextPage(html)
-    if results > len(googles):
-        results = len(googles)
-    return googles[:results]
+    return len(googles)
+    #if results > len(googles):
+    #    results = len(googles)
+    #return googles[:results]

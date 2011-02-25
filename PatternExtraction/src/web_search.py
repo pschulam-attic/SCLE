@@ -48,9 +48,9 @@ class WebExtractor():
         query_none = self.__wrap_query(none.join(list))
         query_one = self.__wrap_query(one.join(list))
         
-        query_two = self.__wrap_query(grad_utils.random_join(to_join = list,
+        query_two = self.__wrap_query(utils.random_join(to_join = list,
                                                              separators = [none, one, two, three]))
-        query_three = self.__wrap_query(grad_utils.random_join(to_join = list,
+        query_three = self.__wrap_query(utils.random_join(to_join = list,
                                                              separators = [none, one, two, three]))
         final_query = "%s OR %s OR %s OR %s" % (query_none, query_one, query_two, query_three)
         if self.debug:
@@ -108,11 +108,11 @@ class YahooExtractor(WebExtractor):
         self.total_counts = 0
         
     def _get_total_counts_from_cache(self):
-        return grad_utils.get_num_from_file(from_file = self.total_counts_cache)   
+        return utils.get_num_from_file(from_file = self.total_counts_cache)   
     
     def cache_total_counts(self):
         if self.total_counts > 0:
-            grad_utils.append_num_to_file(num = self.total_counts, 
+            utils.append_num_to_file(num = self.total_counts, 
                                           to_file = self.total_counts_cache)
     
     def __del__(self):
@@ -126,7 +126,7 @@ class YahooExtractor(WebExtractor):
         return self.srch.parse_results(dom)
     
     def get_count(self, results, cached=False):
-        #return grad_utils.random_int(0, 10000)
+        #return utils.random_int(0, 10000)
         return results.total_results_available
     
     def get_results(self, query, cached=False, start = START, pages = PAGES ):
@@ -181,17 +181,17 @@ class WebCounter():
     
             
     def _get_cache_from_files(self):
-        self.cooc_dict = grad_utils.get_dict_from_file(pattern = "(.+) - (\\d+)", 
+        self.cooc_dict = utils.get_dict_from_file(pattern = "(.+) - (\\d+)", 
                                                        from_file = self.cooc_file)
-        self.freq_dict = grad_utils.get_dict_from_file(pattern = "(.+) - (\\d+)", 
+        self.freq_dict = utils.get_dict_from_file(pattern = "(.+) - (\\d+)", 
                                                        from_file = self.freq_file)
-        self.prox_dict = grad_utils.get_dict_from_file(pattern = "(.+) - (\\d+)", 
+        self.prox_dict = utils.get_dict_from_file(pattern = "(.+) - (\\d+)", 
                                                        from_file = self.prox_file)
     
     def _put_cache_to_files(self):
-        grad_utils.put_dict_to_file(dict = self.freq_dict, to_file = self.freq_file)
-        grad_utils.put_dict_to_file(dict = self.cooc_dict, to_file = self.cooc_file)
-        grad_utils.put_dict_to_file(dict = self.prox_dict, to_file = self.prox_file)
+        utils.put_dict_to_file(dict = self.freq_dict, to_file = self.freq_file)
+        utils.put_dict_to_file(dict = self.cooc_dict, to_file = self.cooc_file)
+        utils.put_dict_to_file(dict = self.prox_dict, to_file = self.prox_file)
         
     def list_to_hash(self, list):
         return ",".join(list)
@@ -296,7 +296,7 @@ class WebCounter():
         """
         prox = self.count_proximity(list, cache)
         cooc = self.count_cooccurrence(list, cache)
-        result = grad_utils.divide(prox, cooc)
+        result = utils.divide(prox, cooc)
         if self.debug:
             print "Calculated proximity count for terms %s - %0.5f (cooc - %d)" % (list, 
                                                                                   result, 
@@ -318,13 +318,13 @@ class WebCounter():
     def count_cooc_over_freq(self, list, cache=False):
         
         cooc, frequencies = self.count_cooc_and_freq(list, cache)
-        return grad_utils.count_num_over_denom(cooc,
-                                               grad_utils.sum(frequencies))
+        return utils.count_num_over_denom(cooc,
+                                               utils.sum(frequencies))
     
     def count_cooc_over_min_freq(self, list, cache=False):
         
        cooc, frequencies = self.count_cooc_and_freq(list, cache)
-       return grad_utils.divide(cooc, min(frequencies))
+       return utils.divide(cooc, min(frequencies))
             
           
 def test():
