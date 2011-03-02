@@ -4,8 +4,9 @@ Created on Feb 19, 2011
 @author: pschulam
 '''
 
-from Google import search
+from webcorpus import WebCorpus
 from string import lower
+import pdb
 
 # Attributes taken from Hartung and Frank
 attributes = [
@@ -22,7 +23,7 @@ attributes = [
               ]
 
 JJ_jj_attr_patterns = [
-                    "\"%s or %s %s\"",          # JJ or JJ ATTR
+                    #"\"%s or %s %s\"",          # JJ or JJ ATTR
                     "\"is %s in %s\"",          # is JJ in ATTR
                     "\"was %s in %s\"",         # was JJ in ATTR
                     "\"are %s in %s\"",         # are JJ in ATTR
@@ -60,34 +61,37 @@ NN_attr_jj_nn_patterns = [
 def select_attribute(NN, JJ):
     NN = lower(NN)
     JJ = lower(JJ)
+    search = WebCorpus()
+    
     # Get counts for the attribute dimensions for both the noun and adjective
     nn_vector = dict([(att, 0) for att in attributes])
     jj_vector = dict([(att, 0) for att in attributes])
     for ATTR in attributes:
         # Collect noun numbers
         for p in NN_nn_jj_attr_patterns:
-            print "searching " + p % (NN, JJ, ATTR)
-            num_results = search(p % (NN, JJ, ATTR), 1000)
-            nn_vector[ATTR] += num_results
+            results = search.get_results(p % (NN, JJ, ATTR))
+            nn_vector[ATTR] += search.get_count(results)
         for p in NN_attr_jj_nn_patterns:
-            num_results = search(p % (ATTR, JJ, NN), 1000)
-            nn_vector[ATTR] += num_results
+            results = search.get_results(p % (ATTR, JJ, NN))
+            nn_vector[ATTR] += search.get_count(results)
         # Collect adjective numbers
         for p in JJ_jj_attr_patterns:
-            num_results = search(p % (JJ, ATTR), 1000)
-            jj_vector[ATTR] += num_results
+            results = search.get_results(p % (JJ, ATTR))
+            jj_vector[ATTR] += search.get_count(results)
         for p in JJ_attr_nn_jj_patterns:
-            num_results = search(p % (ATTR, NN, JJ), 1000)
-            jj_vector[ATTR] += num_results
+            results = search.get_results(p % (ATTR, NN, JJ))
+            jj_vector[ATTR] += search.get_count(results)
         for p in JJ_nn_attr_jj_patterns:
-            num_results = search(p % (NN, ATTR, JJ), 1000)
-            jj_vector[ATTR] += num_results
+            results = search.get_results(p % (NN, ATTR, JJ))
+            jj_vector[ATTR] += search.get_count(results)
+    pdb.set_trace()
     sel_vector = {}
-    for k,v in nn_vector:
+    for k,v in nn_vector.items():
         sel_vector[k] = v * jj_vector[k]
     attribute = ""
     max = 0
-    for k,v in sel_vector:
+    for k,v in sel_vector.items():
         if v > max:
             attribute = k
+    print "Performed %d searches" % search.total_counts
     return attribute
