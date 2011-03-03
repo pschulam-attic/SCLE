@@ -6,7 +6,6 @@ Created on Feb 19, 2011
 
 from webcorpus import WebCorpus
 from string import lower
-import pdb
 
 # Attributes taken from Hartung and Frank
 attributes = [
@@ -74,6 +73,7 @@ def select_attribute(NN, JJ):
         for p in NN_attr_jj_nn_patterns:
             results = search.get_results(p % (ATTR, JJ, NN))
             nn_vector[ATTR] += search.get_count(results)
+            
         # Collect adjective numbers
         for p in JJ_jj_attr_patterns:
             results = search.get_results(p % (JJ, ATTR))
@@ -84,7 +84,6 @@ def select_attribute(NN, JJ):
         for p in JJ_nn_attr_jj_patterns:
             results = search.get_results(p % (NN, ATTR, JJ))
             jj_vector[ATTR] += search.get_count(results)
-    pdb.set_trace()
     sel_vector = {}
     for k,v in nn_vector.items():
         sel_vector[k] = v * jj_vector[k]
@@ -93,5 +92,4 @@ def select_attribute(NN, JJ):
     for k,v in sel_vector.items():
         if v > max:
             attribute = k
-    print "Performed %d searches" % search.total_counts
     return attribute
