@@ -7,9 +7,9 @@ Created on Feb 17, 2011
 from os import system
 from string import split
 
-path = "/Users/pschulam/Desktop/Thesis/src/stanford-postagger/"
+path = "/home/pschulam/Documents/SCLE/src/stanford-postagger/"
 memory = "-mx600m"
-classpath = "-classpath %sstanford-postagger.jar" % path
+classpath = "-classpath %stanford-postagger.jar" % path
 tagger = "edu.stanford.nlp.tagger.maxent.MaxentTagger"
 model = "-model %smodels/bidirectional-distsim-wsj-0-18.tagger" % path
 
