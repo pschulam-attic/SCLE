@@ -28,7 +28,7 @@ def build_concepts(pairs):
 def clean_concepts(concepts):
     pass
 
-def find_adjectives(trees):
+def find_adjectives(trees, out_file=None):
     '''
     Search through the parse tree of a sentence and find adjectives.
     When an adjective is found, look at the ancestors to try and determine
@@ -49,9 +49,13 @@ def find_adjectives(trees):
                 if p:
                     pairs.append(p)
     concepts = build_concepts(pairs)
-    for k, v in concepts.items():
-        for a in v:
-            print "%s is %s" % (k, a)
-
-        
-        
+    if out_file:
+        f = open(out_file, 'w')
+        for k, v in concepts.items():
+            for a in v:
+                f.write("%s,%s\n", (k,a))
+        f.close()
+    else:
+        for k, v in concepts.items():
+            for a in v:
+                print "%s is %s" % (k, a)

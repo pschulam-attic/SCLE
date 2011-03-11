@@ -2,7 +2,7 @@ from os import system
 from sys import argv
 from string import split
 
-collins_path = "/Users/pschulam/Desktop/Thesis/src/COLLINS-PARSER/"
+collins_path = "/home/pschulam/Documents/SCLE/src/COLLINS-PARSER/"
 events_path = collins_path + "models/model1/events.gz"
 parser_path = collins_path + "code/parser"
 grammar_path = collins_path + "models/model1/grammar"
