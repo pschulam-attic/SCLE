@@ -53,7 +53,7 @@ def find_adjectives(trees, out_file=None):
         f = open(out_file, 'w')
         for k, v in concepts.items():
             for a in v:
-                f.write("%s,%s\n", (k,a))
+                f.write("%s,%s\n" % (k,a))
         f.close()
     else:
         for k, v in concepts.items():

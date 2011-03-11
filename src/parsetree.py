@@ -23,8 +23,8 @@ class ParseTree(object):
 
     @staticmethod
     def build_node(str):
-        print "Examining: %s" % str
-        m = re.match(r'^\((\w+)~([\w\d\,\.\'\-\$]+)~\d+~\d+', str)
+        # print "Examining: %s" % str
+        m = re.match(r'^\((\w+)~([\w\d\,\.\'\-\$\%]+)~\d+~\d+', str)
         parent = ParseNode(m.groups()[0], m.groups()[1])
         str = str[m.end():]
 

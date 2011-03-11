@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from string import split
 from sys import argv
 from stanford_tagger import tag
 from collins_parser import parse
@@ -26,7 +27,8 @@ def main():
         tree = ParseTree(line)
         parse_trees.append(tree)
 
-    find_adjectives(parse_trees)
+    out_file = split(clean_file, '.')[0] + '.out'
+    find_adjectives(parse_trees, out_file)
 
 if __name__ == "__main__":
     main()
