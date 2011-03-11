@@ -6,7 +6,7 @@ from combs import *
 
 PAGES = 10
 START = 1
-YAHOO_API = "Vera.Sheinman.Key"
+YAHOO_API = "Peter.Schulam.Key"
 
 __author__ = "Vera Sheinman"
 

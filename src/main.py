@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from sys import argv
 from stanford_tagger import tag
-from parser import parse
+from collins_parser import parse
 from util import clean_parse
 from parsetree import ParseTree
 from adjfinder import find_adjectives
